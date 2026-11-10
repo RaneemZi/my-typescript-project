@@ -97,3 +97,23 @@ class Student extends User {
         }
 
 }
+
+const employee1 = new employee("ٌRaneem Zialnoon", "123-456-7890", new Date(2003, 6, 16), 101, 50000);
+const student1 = new Student("Dana Zialnoon", "987-654-3210", new Date(2007, 11, 12), 202, [85, 90, 78], 0);
+
+console.table([
+    {
+        type: "Employee",
+        name: employee1.Name,
+        phone: employee1.Phone,
+        age: employee1.calculateAge()
+    },
+    {
+        type: "Student",
+        name: student1.Name,
+        phone: student1.Phone,
+        age: student1.calculateAge(),
+        GPA: student1.calculateGPA()
+    }
+]);
+
