@@ -1,24 +1,26 @@
 export namespace Users {
 
 export interface IUser {
-    name: string;
-    phone: string;
+    Name: string;
+    Phone: string;
+    DateOfBirth: Date;
+    Role: string;
 
     calculateAge(): number;
     displayInfo(): void;
 }
 
 export interface IStudent {
-    studentId: number;
-    marks: number[];
+    StudentId: number;
+    Marks: number[];
 
     calculateGPA(): number;
     validateMarks(marks: number[]): void;
 }
 
 export interface IEmployee {
-    employeeId: number;
-    salary: number;
+    EmployeeId: number;
+    Salary: number;
     calculateBonus(): number;
     displayInfo(): void;
 }

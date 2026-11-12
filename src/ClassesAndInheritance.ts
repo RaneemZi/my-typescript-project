@@ -2,10 +2,10 @@ import { UserRole } from "./UserRole";
 import { Users } from "./interface";
 
 abstract class User implements Users.IUser {
-    name: string;
-    phone: string;
-    dateOfBirth: Date;
-    role: UserRole;
+    private name: string;
+    private phone: string;
+    private dateOfBirth: Date;
+    private role: UserRole;
 
   constructor(name: string, phone: string, dateOfBirth: Date, role: UserRole = UserRole.User) {
     this.name = name;
@@ -53,6 +53,13 @@ abstract class User implements Users.IUser {
         this.dateOfBirth = dateOfBirth;
           }
 
+    get Role(): UserRole {
+        return this.role;
+          } 
+    set Role(role: UserRole) {
+        this.role = role;
+          }
+
           displayInfo(): void {
             console.log(`Name: ${this.name}`);
             console.log(`Phone: ${this.phone}`);
@@ -63,13 +70,17 @@ abstract class User implements Users.IUser {
 }
 
   class Employee extends User implements Users.IEmployee {
-     employeeId: number
-     salary: number
+     private employeeId: number
+     private salary: number
 
     constructor(name: string, phone: string, dateOfBirth: Date, employeeId: number, salary: number) {
       super(name, phone, dateOfBirth, UserRole.Employee);
       this.employeeId = employeeId;
       this.salary = salary;
+
+      if(salary < 0) {
+        throw new Error("Salary cannot be negative");
+      }
     }
     get EmployeeId(): number {
             return this.employeeId;
@@ -81,6 +92,9 @@ abstract class User implements Users.IUser {
             return this.salary;
         }
     set Salary(salary: number) {
+        if(salary < 0) {
+            throw new Error("Salary cannot be negative");
+        }
             this.salary = salary;
         }
 
@@ -88,7 +102,7 @@ abstract class User implements Users.IUser {
             return this.salary * 0.1; // 10% bonus
         }
 
-    displayInfo(): void {
+   override displayInfo(): void {
             super.displayInfo();
             console.log(`Employee ID: ${this.employeeId}`);
             console.log(`Salary: $${this.salary.toFixed(2)}`);
@@ -96,18 +110,19 @@ abstract class User implements Users.IUser {
 }
 
 class Student extends User implements Users.IStudent {
-     studentId: number
-     marks: number[] 
-     gpa: number
+    private studentId: number
+    private marks: number[] 
 
-    constructor(name: string, phone: string, dateOfBirth: Date, studentId: number, marks: number[], gpa: number) {
+    constructor(name: string, phone: string, dateOfBirth: Date, studentId: number, marks: number[]) {
       super(name, phone, dateOfBirth, UserRole.Student);
       this.studentId = studentId;
       this.marks = marks;
-      this.gpa = gpa;
+      
 
       this.validateMarks(marks);
       this.marks = [...marks];
+
+    
     }
 
     get StudentId(): number {
@@ -117,13 +132,16 @@ class Student extends User implements Users.IStudent {
             this.studentId = studentId;
         }
     get GPA(): number {
-            return this.gpa;
+            return this.calculateGPA();
         }
-    set GPA(gpa: number) {
-        if (gpa < 0 || gpa > 100) {
-        throw new Error("GPA must be between 0 and 100");
-    }
-            this.gpa = gpa;
+
+    get Marks(): number[] {
+            return [...this.marks];
+        }
+        
+    set Marks(marks: number[]) {
+            this.validateMarks(marks);
+            this.marks = [...marks];
         }
 
      validateMarks(marks: number[]): void {
@@ -132,28 +150,33 @@ class Student extends User implements Users.IStudent {
     }
 }
      calculateGPA(): number {
-              if (this.marks.length === 0) {
-        throw new Error("Marks array cannot be empty"); }
+         if(this.marks.length === 0) {
+        console.log("No Marks");
+        return 0;
+    }
             const total = this.marks.reduce((sum, mark) => sum + mark, 0);
-            this.gpa = total / this.marks.length;
-            return this.gpa;
+            
+            return total / this.marks.length;;
         }
 
-    displayInfo(): void {
+    
+
+    override displayInfo(): void {
             super.displayInfo();
             console.log(`Student ID: ${this.studentId}`);
             console.log(`Marks: ${this.marks.join(", ")}`);
             console.log(`GPA: ${this.calculateGPA().toFixed(2)}`);
-            console.log(`Role: ${this.role}`);
         }
 }
-
+try{
 const employee1 = new Employee("ٌRaneem Zialnoon", "123-456-7890", new Date(2003, 6, 16), 101, 50000);
-const student1 = new Student("Dana Zialnoon", "987-654-3210", new Date(2007, 11, 12), 202, [85, 80, 78], 0);
+const employee2 = new Employee("Tasneem Zialnoon", "123-456-7890", new Date(2003, 6, 16), 101, 1000);
+
+const student1 = new Student("Dana Zialnoon", "987-654-3210", new Date(2000, 11, 12), 202, [80.5, 90, 95]);
 
 function displayUsers<T extends User>(users: T[]): void {
     users.forEach(user => {
-        console.group(user.role);
+        console.group(user.Role);
 
         user.displayInfo();
 
@@ -163,7 +186,17 @@ function displayUsers<T extends User>(users: T[]): void {
 
 const users: User[] = [
     employee1,
+    employee2,
     student1
 ];
 
 displayUsers(users);
+}
+catch (error) {
+    if (error instanceof Error) {
+        console.error("Error:", error.message);
+    } else {
+        console.error("Unexpected error:", error);
+    }
+}
+
